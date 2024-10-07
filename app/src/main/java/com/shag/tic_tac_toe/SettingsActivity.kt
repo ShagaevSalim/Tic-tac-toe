@@ -144,21 +144,21 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun updateSoundValue(value: Int){
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit()){
-            putInt("sound_value", value)
+            putInt(PREF_SOUND_LEVEL, value)
             apply()
         }
     }
 
     private fun updateLvl(lvl: Int){
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit()){
-            putInt("lvl", lvl)
+            putInt(PREF_LVL, lvl)
             apply()
         }
     }
 
     private fun updateRules(rules: Int){
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit()){
-            putInt("rules", rules)
+            putInt(PREF_RULES, rules)
             apply()
         }
     }
@@ -166,9 +166,9 @@ class SettingsActivity : AppCompatActivity() {
     private fun getSettingsInfo(): SettingsInfo
     {
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)){
-            val soundLvl = getInt("sound_lvl", 0)
-            val lvl = getInt("lvl", 0)
-            val rules = getInt("rules", 0)
+            val soundLvl = getInt(PREF_SOUND_LEVEL, 0)
+            val lvl = getInt(PREF_LVL, 0)
+            val rules = getInt(PREF_RULES, 0)
 
             return SettingsInfo(soundLvl, lvl, rules)
         }
@@ -179,4 +179,11 @@ class SettingsActivity : AppCompatActivity() {
         val lvl: Int,
         val rules: Int,
     )
+
+    companion object{
+        const val PREF_SOUND_LEVEL = "pref_sound_level"
+        const val PREF_LVL = "pref_lvl"
+        const val PREF_RULES = "pref_rules"
+    }
+
 }
