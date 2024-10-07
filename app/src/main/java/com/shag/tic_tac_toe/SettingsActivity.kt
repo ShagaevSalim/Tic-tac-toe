@@ -60,6 +60,10 @@ class SettingsActivity : AppCompatActivity() {
         binding.infoLevel.text = resources.getStringArray(R.array.game_level)[currentLvl]
         binding.soundBar.progress = currentSoundLevel
 
+        binding.toBack.setOnClickListener{
+            onBackPressedDispatcher.onBackPressed()
+        }
+
 
         binding.prevLvl.setOnClickListener{
             currentLvl--
@@ -147,6 +151,7 @@ class SettingsActivity : AppCompatActivity() {
             putInt(PREF_SOUND_LEVEL, value)
             apply()
         }
+        setResult((RESULT_OK))
     }
 
     private fun updateLvl(lvl: Int){
@@ -154,6 +159,8 @@ class SettingsActivity : AppCompatActivity() {
             putInt(PREF_LVL, lvl)
             apply()
         }
+        setResult((RESULT_OK))
+
     }
 
     private fun updateRules(rules: Int){
@@ -161,14 +168,16 @@ class SettingsActivity : AppCompatActivity() {
             putInt(PREF_RULES, rules)
             apply()
         }
+        setResult((RESULT_OK))
+
     }
 
     private fun getSettingsInfo(): SettingsInfo
     {
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)){
-            val soundLvl = getInt(PREF_SOUND_LEVEL, 0)
+            val soundLvl = getInt(PREF_SOUND_LEVEL, 50)
             val lvl = getInt(PREF_LVL, 0)
-            val rules = getInt(PREF_RULES, 0)
+            val rules = getInt(PREF_RULES, 7)
 
             return SettingsInfo(soundLvl, lvl, rules)
         }

@@ -44,38 +44,38 @@ class GameActivity : AppCompatActivity() {
 
 
         binding.cell11.setOnClickListener{
-            makeStepOfUser(1,1)
+            makeStepOfUser(0,0)
         }
         binding.cell12.setOnClickListener{
-            makeStepOfUser(1,2)
+            makeStepOfUser(0,1)
 
         }
         binding.cell13.setOnClickListener{
-            makeStepOfUser(1,3)
+            makeStepOfUser(0,2)
 
         }
         binding.cell21.setOnClickListener{
-            makeStepOfUser(2,1)
+            makeStepOfUser(1,0)
 
         }
         binding.cell22.setOnClickListener{
-            makeStepOfUser(2,2)
+            makeStepOfUser(1,1)
 
         }
         binding.cell23.setOnClickListener{
-            makeStepOfUser(2,3)
+            makeStepOfUser(1,2)
 
         }
         binding.cell31.setOnClickListener{
-            makeStepOfUser(3,1)
+            makeStepOfUser(2,0)
 
         }
         binding.cell32.setOnClickListener{
-            makeStepOfUser(3,2)
+            makeStepOfUser(2,1)
 
         }
         binding.cell33.setOnClickListener{
-            makeStepOfUser(3,3)
+            makeStepOfUser(2,2)
 
         }
 
@@ -101,6 +101,7 @@ class GameActivity : AppCompatActivity() {
         setVolumeMediaPlayer(settingsInfo.soundLvl)
 
         mediaPlayer.start()
+        binding.chronometr.start()
     }
 
     override fun onDestroy(){
@@ -137,15 +138,15 @@ class GameActivity : AppCompatActivity() {
         }
 
         when(position){
-            "11" -> binding.cell11.setImageResource(resId)
-            "12" -> binding.cell12.setImageResource(resId)
-            "13" -> binding.cell13.setImageResource(resId)
-            "21" -> binding.cell21.setImageResource(resId)
-            "22" -> binding.cell22.setImageResource(resId)
-            "23" -> binding.cell23.setImageResource(resId)
-            "31" -> binding.cell31.setImageResource(resId)
-            "32" -> binding.cell32.setImageResource(resId)
-            "33" -> binding.cell33.setImageResource(resId)
+            "00" -> binding.cell11.setImageResource(resId)
+            "01" -> binding.cell12.setImageResource(resId)
+            "02" -> binding.cell13.setImageResource(resId)
+            "10" -> binding.cell21.setImageResource(resId)
+            "11" -> binding.cell22.setImageResource(resId)
+            "12" -> binding.cell23.setImageResource(resId)
+            "20" -> binding.cell31.setImageResource(resId)
+            "21" -> binding.cell32.setImageResource(resId)
+            "22" -> binding.cell33.setImageResource(resId)
         }
     }
 
@@ -217,7 +218,7 @@ class GameActivity : AppCompatActivity() {
     }
 
 
-    private fun checkGameField(row: Int, column: Int, symbol: String): StatusInfo{
+    private fun checkGameField(x: Int, y: Int, symbol: String): StatusInfo{
         var row = 0
         var column = 0
         var leftDiagonal = 0
@@ -225,9 +226,9 @@ class GameActivity : AppCompatActivity() {
         var n = gameField.size
 
         for(i in 0..2){
-            if(gameField[row][i] == symbol)
+            if(gameField[x][i] == symbol)
                 column++
-            if(gameField[i][column]==symbol)
+            if(gameField[i][y]==symbol)
                 row++
             if(gameField[i][i] == symbol)
                 leftDiagonal++
@@ -324,6 +325,24 @@ class GameActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+    if(requestCode== REQUEST_POPUP_MENU){
+        if(resultCode== RESULT_OK){
+            settingsInfo = getSettingsInfo()
+
+            mediaPlayer = MediaPlayer.create(this,R.raw.themel)
+            mediaPlayer.isLooping = true
+            setVolumeMediaPlayer(settingsInfo.soundLvl)
+
+            mediaPlayer.start()
+        }
+        else{
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+
+    }
 
     private fun showPopupMenu(){
         val dialog = Dialog(this, R.style.Base_Theme_Tictactoe)
@@ -344,10 +363,8 @@ class GameActivity : AppCompatActivity() {
         toSettings.setOnClickListener{
             dialog.hide()
             val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_POPUP_MENU)
 
-            settingsInfo = getSettingsInfo()
-            setVolumeMediaPlayer(settingsInfo.soundLvl)
         }
 
         toExit.setOnClickListener{
@@ -411,9 +428,9 @@ class GameActivity : AppCompatActivity() {
     private fun getSettingsInfo(): SettingsInfo
     {
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)){
-            val soundLvl = getInt(PREF_SOUND_LEVEL, 0)
+            val soundLvl = getInt(PREF_SOUND_LEVEL, 50)
             val lvl = getInt(PREF_LVL, 0)
-            val rules = getInt(PREF_RULES, 0)
+            val rules = getInt(PREF_RULES, 7)
 
             return SettingsInfo(soundLvl, lvl, rules)
         }
@@ -428,5 +445,7 @@ class GameActivity : AppCompatActivity() {
         const val PREF_TIME = "pref_time"
         const val PREF_GAME_FIELD = "pref_game_field"
 
+
+        const val REQUEST_POPUP_MENU = 123
     }
 }
