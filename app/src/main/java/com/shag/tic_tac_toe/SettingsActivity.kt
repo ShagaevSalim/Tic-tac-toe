@@ -29,8 +29,8 @@ class SettingsActivity : AppCompatActivity() {
         currentLvl = data.lvl
 
         when(currentRules){
-            1 -> binding.checkboxVertical.isChecked = true
-            2 -> binding.checkboxHorizontal.isChecked = true
+            1 -> binding.checkboxHorizontal.isChecked = true
+            2 -> binding.checkboxVertical.isChecked = true
             3 -> {
                 binding.checkboxVertical.isChecked = true
                 binding.checkboxHorizontal.isChecked = true
@@ -114,9 +114,6 @@ class SettingsActivity : AppCompatActivity() {
             }else{
                 currentRules--
             }
-
-
-
             updateRules(currentRules)
         }
 
@@ -145,6 +142,8 @@ class SettingsActivity : AppCompatActivity() {
 
         setContentView(binding.root)
     }
+ // OnCreate END HERE
+
 
     private fun updateSoundValue(value: Int){
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE).edit()){

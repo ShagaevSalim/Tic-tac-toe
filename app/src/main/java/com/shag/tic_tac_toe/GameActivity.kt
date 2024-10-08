@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.shag.tic_tac_toe.SettingsActivity.Companion.PREF_LVL
 import com.shag.tic_tac_toe.SettingsActivity.Companion.PREF_RULES
@@ -20,12 +21,21 @@ import com.shag.tic_tac_toe.databinding.ActivityGameBinding
 class GameActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGameBinding
-
     private lateinit var gameField: Array<Array<String>>
-
     private lateinit var settingsInfo: SettingsActivity.SettingsInfo
-
     private lateinit var mediaPlayer: MediaPlayer
+    private val result =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                mediaPlayer = MediaPlayer.create(this, R.raw.themel)
+                mediaPlayer.isLooping = true
+                val settingsInfo = getSettingsInfo()
+                setVolumeMediaPlayer(settingsInfo.soundLvl)
+
+                binding.chronometr.start()
+                mediaPlayer.start()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +46,7 @@ class GameActivity : AppCompatActivity() {
             showPopupMenu()
         }
         binding.toGameClose.setOnClickListener{
-
             onBackPressedDispatcher.onBackPressed()
-
         }
 
 
@@ -79,11 +87,8 @@ class GameActivity : AppCompatActivity() {
 
         }
 
-
-
-
-
         setContentView(binding.root)
+
 
         val time = intent.getLongExtra(MainActivity.EXTRA_TIME, 0)
         val gameField = intent.getStringExtra(MainActivity.EXTRA_GAME_FIELD)
@@ -99,7 +104,6 @@ class GameActivity : AppCompatActivity() {
         mediaPlayer = MediaPlayer.create(this,R.raw.themel)
         mediaPlayer.isLooping = true
         setVolumeMediaPlayer(settingsInfo.soundLvl)
-
         mediaPlayer.start()
         binding.chronometr.start()
     }
@@ -112,27 +116,21 @@ class GameActivity : AppCompatActivity() {
     override fun onStop(){
         super.onStop()
         mediaPlayer.release()
-
     }
-
     private fun setVolumeMediaPlayer(soundValue: Int){
         val volume = soundValue/100.0
         mediaPlayer.setVolume(volume.toFloat(), volume.toFloat())
     }
-
     private fun initGameField(){
         gameField = Array(3){Array(3){" "} }
     }
-
     private fun makeStep(row: Int, column: Int, symbol: String){
         gameField[row][column] = symbol
-
         makeStepUI("$row$column", symbol)
     }
-
     private fun makeStepUI(position: String, symbol: String){
         val resId = when(symbol){
-            "x" -> R.drawable.ic_cross
+            "X" -> R.drawable.ic_cross
             "0" -> R.drawable.ic_zero
             else -> return
         }
@@ -154,33 +152,25 @@ class GameActivity : AppCompatActivity() {
 
         if(isEmptyField(row,column)){
             makeStep(row,column,"X")
-
             val status = checkGameField(row, column, "X")
             if (status.status){
                 showGameStatus(STATUS_PLAYER_WIN)
                 return
             }
-
             if(!isFilledGameField()){
                 makeStepOfAI()
-
                 val statusAI = checkGameField(row, column, "0")
                 if(statusAI.status){
                     showGameStatus(STATUS_PLAYER_LOSE)
                     return
                 }
-
-                if(!isFilledGameField()){
-                    showGameStatus(STATUS_PLAYER_DRAW)
-                    return
-                }
+//                if(!isFilledGameField()){
+//                    showGameStatus(STATUS_PLAYER_DRAW)
+//                    return
+//                }
             }else{
                 showGameStatus(STATUS_PLAYER_DRAW)
-                return
             }
-
-
-
         }else{
             Toast.makeText(this,"Поле уже заполнено", Toast.LENGTH_SHORT).show()
         }
@@ -235,7 +225,6 @@ class GameActivity : AppCompatActivity() {
             if(gameField[i][n-i-1]==symbol)
                 rightDiagonal++
         }
-
         return when(settingsInfo.rules){
             1 ->{
                 if(column==n)
@@ -281,9 +270,6 @@ class GameActivity : AppCompatActivity() {
             }
             else ->  StatusInfo(false, "")
         }
-
-
-
     }
 
     data class StatusInfo(
@@ -325,24 +311,6 @@ class GameActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
-    if(requestCode== REQUEST_POPUP_MENU){
-        if(resultCode== RESULT_OK){
-            settingsInfo = getSettingsInfo()
-
-            mediaPlayer = MediaPlayer.create(this,R.raw.themel)
-            mediaPlayer.isLooping = true
-            setVolumeMediaPlayer(settingsInfo.soundLvl)
-
-            mediaPlayer.start()
-        }
-        else{
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-
-    }
 
     private fun showPopupMenu(){
         val dialog = Dialog(this, R.style.Base_Theme_Tictactoe)
@@ -363,8 +331,9 @@ class GameActivity : AppCompatActivity() {
         toSettings.setOnClickListener{
             dialog.hide()
             val intent = Intent(this, SettingsActivity::class.java)
-            startActivityForResult(intent, REQUEST_POPUP_MENU)
-
+            result.launch(intent)
+            settingsInfo = getSettingsInfo()
+            setVolumeMediaPlayer(settingsInfo.soundLvl)
         }
 
         toExit.setOnClickListener{
@@ -374,9 +343,7 @@ class GameActivity : AppCompatActivity() {
             dialog.dismiss()
             onBackPressedDispatcher.onBackPressed()
         }
-
         dialog.show()
-
     }
 
 

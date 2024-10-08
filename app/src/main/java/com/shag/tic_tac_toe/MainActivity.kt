@@ -2,10 +2,8 @@ package com.shag.tic_tac_toe
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.shag.tic_tac_toe.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -22,10 +20,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.toContinueGame.setOnClickListener{
-            val data = getInfoAboutGame()
+            val gameInfo = getInfoAboutGame()
             val intent = Intent(this, GameActivity::class.java).apply{
-                putExtra(EXTRA_TIME, data.time)
-                putExtra(EXTRA_GAME_FIELD, data.gameField)
+                putExtra(EXTRA_TIME, gameInfo.time)
+                putExtra(EXTRA_GAME_FIELD, gameInfo.gameField)
             }
             startActivity(intent)
         }
@@ -36,6 +34,43 @@ class MainActivity : AppCompatActivity() {
 
 
         setContentView(binding.root)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        println("onCreate()")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        println("onDestroy()")
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        println("onStop()")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        println("onStart()")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        println("onRestart()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        println("onResume()")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        println("onPause()")
     }
 
     private fun getInfoAboutGame(): InfoGame{
