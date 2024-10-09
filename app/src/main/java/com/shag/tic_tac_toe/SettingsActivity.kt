@@ -29,8 +29,8 @@ class SettingsActivity : AppCompatActivity() {
         currentLvl = data.lvl
 
         when(currentRules){
-            1 -> binding.checkboxHorizontal.isChecked = true
-            2 -> binding.checkboxVertical.isChecked = true
+            1 -> binding.checkboxVertical.isChecked = true
+            2 -> binding.checkboxHorizontal.isChecked = true
             3 -> {
                 binding.checkboxVertical.isChecked = true
                 binding.checkboxHorizontal.isChecked = true

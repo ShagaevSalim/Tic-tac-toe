@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -227,13 +228,13 @@ class GameActivity : AppCompatActivity() {
         }
         return when(settingsInfo.rules){
             1 ->{
-                if(column==n)
+                if(row==n)
                     StatusInfo(true,symbol)
                 else
                     StatusInfo(false, "")
             }
             2 ->{
-                if(row==n)
+                if(column==n)
                     StatusInfo(true,symbol)
                 else
                     StatusInfo(false, "")
@@ -320,7 +321,7 @@ class GameActivity : AppCompatActivity() {
             setCancelable(true)
         }
 
-        val toContinue = dialog.findViewById<ImageView>(R.id.dialogContinue)
+        val toContinue = dialog.findViewById<TextView>(R.id.dialogContinue)
         val toSettings = dialog.findViewById<TextView>(R.id.dialogSettings)
         val toExit = dialog.findViewById<TextView>(R.id.dialogExit)
 
@@ -386,9 +387,10 @@ class GameActivity : AppCompatActivity() {
 
         this.gameField.forEachIndexed{indexRow, strings ->
             strings.forEachIndexed{indexColumn, s->
-                makeStep(indexRow, indexColumn, this.gameField[indexRow][indexColumn])
+                makeStepUI("$indexRow$indexColumn", s)
             }
         }
+        Log.d("GameDebug", "gameField: ${this.gameField.joinToString(",")}")
 
     }
 
