@@ -159,16 +159,16 @@ class GameActivity : AppCompatActivity() {
                 return
             }
             if(!isFilledGameField()){
-                makeStepOfAI()
-                val statusAI = checkGameField(row, column, "0")
+                val resultCell = makeStepOfAI()
+                val statusAI = checkGameField(resultCell.row, resultCell.column, "0")
                 if(statusAI.status){
                     showGameStatus(STATUS_PLAYER_LOSE)
                     return
                 }
-//                if(!isFilledGameField()){
-//                    showGameStatus(STATUS_PLAYER_DRAW)
-//                    return
-//                }
+                if(isFilledGameField()){
+                    showGameStatus(STATUS_PLAYER_DRAW)
+                    return
+                }
             }else{
                 showGameStatus(STATUS_PLAYER_DRAW)
             }
@@ -181,23 +181,156 @@ class GameActivity : AppCompatActivity() {
         return gameField[row][column] == " "
     }
 
-    private fun makeStepOfAI(){
-        when(settingsInfo.lvl){
+    private fun makeStepOfAI(): CellGameFild{
+        return when(settingsInfo.lvl){
             0 -> makeStepOfAIEasyLvl()
             1 -> makeStepOfAIMediumLvl()
-            3 -> makeStepOfAIHardLvl()
+            2 -> makeStepOfAIHardLvl()
+            else -> CellGameFild(0,0)
         }
     }
 
-    private fun makeStepOfAIHardLvl() {
-        TODO("Not yet implemented")
+    data class CellGameFild(val row: Int, val column: Int,)
+
+    private fun makeStepOfAIHardLvl(): CellGameFild {
+        var bestScore = Double.NEGATIVE_INFINITY
+        var move = CellGameFild(0,0)
+
+        val board = gameField.map{it.clone()}.toTypedArray()
+        board.forEachIndexed{indexRow, cols ->
+            cols.forEachIndexed{indexCols, cell ->
+                if(board[indexRow][indexCols] == " "){
+                    board[indexRow][indexCols] = "0"
+                    val score = minimax(board, false)
+                    board[indexRow][indexCols] = " "
+                    if(score > bestScore){
+                        bestScore = score
+                        move = CellGameFild(indexRow, indexCols)
+                    }
+                }
+            }
+        }
+
+        makeStepUI("${move.row}${move.column}","0")
+
+        return move
+
     }
 
-    private fun makeStepOfAIMediumLvl() {
-        TODO("Not yet implemented")
+    private fun minimax(board: Array<Array<String>>, isMax: Boolean): Double {
+        val result = checkWinner(board)
+        result?.let {
+            return scores[result]!!
+        }
+
+        if (isMax){
+            var bestScore = Double.NEGATIVE_INFINITY
+
+            board.forEachIndexed{indexRow, cols ->
+                cols.forEachIndexed{indexCols, cell ->
+                    if(board[indexRow][indexCols] == " "){
+                        board[indexRow][indexCols] = "0"
+                        val score = minimax(board,false)
+                        board[indexRow][indexCols] = " "
+                        if(score > bestScore){
+                            bestScore = score
+                        }
+                    }
+                }
+            }
+            return bestScore
+        }else{
+            var bestScore = Double.POSITIVE_INFINITY
+
+            board.forEachIndexed{indexRow, cols ->
+                cols.forEachIndexed{indexCols, cell ->
+                    if(board[indexRow][indexCols] == " "){
+                        board[indexRow][indexCols] = "X"
+                        val score = minimax(board, true)
+                        board[indexRow][indexCols] = " "
+                        if(score < bestScore){
+                            bestScore = score
+                        }
+                    }
+                }
+            }
+            return bestScore
+        }
     }
 
-    private fun makeStepOfAIEasyLvl(){
+    private fun checkWinner(board: Array<Array<String>>): Int? {
+        var countRowsHu = 0
+        var countRowsAt = 0
+        var countLDHu = 0
+        var countLDAT = 0
+        var countRDHu = 0
+        var countRDAI = 0
+
+        board.forEachIndexed { indexRow, cols ->
+            if(cols.all{it=="X"})
+                return STATUS_PLAYER_WIN
+            else if(cols.all{it=="0"})
+                return STATUS_PLAYER_LOSE
+
+            countRowsHu = 0
+            countRowsAt = 0
+
+            cols.forEachIndexed { indexCols, cell ->
+                if(board[indexCols][indexRow] == "X")
+                    countRowsHu++
+                else if(board[indexCols][indexRow] == "0")
+                    countRowsAt++
+
+                if(indexRow == indexCols && board[indexCols][indexRow] == "X")
+                    countLDHu++
+                else if(indexRow==indexCols && board[indexCols][indexRow] == "0")
+                    countLDAT++
+
+                if(indexRow == 2-indexCols && board[indexCols][indexRow] == "X")
+                    countRDHu++
+                else if(indexRow == 2-indexCols && board[indexCols][indexRow] == "0")
+                    countRDAI++
+            }
+
+            if(countRowsHu == 3 || countLDHu == 3 || countRDHu == 3)
+                return STATUS_PLAYER_WIN
+            else if(countRowsAt == 3 || countLDAT == 3 || countRDAI == 3)
+                return STATUS_PLAYER_LOSE
+
+
+        }
+        board.forEach {
+            if(it.find{it==" "} != null)
+                return null
+        }
+        return STATUS_PLAYER_DRAW
+    }
+
+    private fun makeStepOfAIMediumLvl(): CellGameFild {
+        var bestScore = Double.NEGATIVE_INFINITY
+        var move = CellGameFild(0,0)
+
+        val board = gameField.map{it.clone()}.toTypedArray()
+        board.forEachIndexed{indexRow, cols ->
+            cols.forEachIndexed{indexCols, cell ->
+                if(board[indexRow][indexCols] == " "){
+                    board[indexRow][indexCols] = "0"
+                    val score = minimax(board, false)
+                    board[indexRow][indexCols] = " "
+                    if(score > bestScore){
+                        bestScore = score
+                        move = CellGameFild(indexRow, indexCols)
+                    }
+                }
+            }
+        }
+
+        makeStep(move.row, move.column, "0")
+
+        return move
+    }
+
+    private fun makeStepOfAIEasyLvl(): CellGameFild{
         var randRow = 0
         var randColumn = 0
         do {
@@ -206,6 +339,8 @@ class GameActivity : AppCompatActivity() {
         } while(!isEmptyField(randRow, randColumn))
 
         makeStep(randRow, randColumn, "0")
+
+        return CellGameFild(randRow,randColumn)
     }
 
 
@@ -362,8 +497,8 @@ class GameActivity : AppCompatActivity() {
 
     private fun convertGameFieldToString(gameField: Array<Array<String>>): String{
         val tmpArray = arrayListOf<String>()
-        gameField.forEach { tmpArray.add(it.joinToString { ";" }) }
-        return tmpArray.joinToString { "\n" }
+        gameField.forEach { tmpArray.add(it.joinToString (";")) }
+        return tmpArray.joinToString ("\n")
     }
 
     private fun saveGame(time: Long, gameField: String){
@@ -413,6 +548,13 @@ class GameActivity : AppCompatActivity() {
 
         const val PREF_TIME = "pref_time"
         const val PREF_GAME_FIELD = "pref_game_field"
+
+
+        val scores = hashMapOf(
+            Pair(STATUS_PLAYER_WIN, -1.0),
+            Pair(STATUS_PLAYER_LOSE, 1.0),
+            Pair(STATUS_PLAYER_DRAW, 0.0)
+        )
 
 
         const val REQUEST_POPUP_MENU = 123

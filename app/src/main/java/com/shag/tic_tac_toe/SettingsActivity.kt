@@ -142,7 +142,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setContentView(binding.root)
     }
- // OnCreate END HERE
+    // OnCreate END HERE
 
 
     private fun updateSoundValue(value: Int){
@@ -175,7 +175,7 @@ class SettingsActivity : AppCompatActivity() {
     {
         with(getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)){
             val soundLvl = getInt(PREF_SOUND_LEVEL, 50)
-            val lvl = getInt(PREF_LVL, 0)
+            val lvl = getInt(PREF_LVL, 1)
             val rules = getInt(PREF_RULES, 7)
 
             return SettingsInfo(soundLvl, lvl, rules)

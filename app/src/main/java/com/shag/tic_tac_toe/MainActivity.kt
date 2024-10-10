@@ -20,10 +20,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.toContinueGame.setOnClickListener{
-            val gameInfo = getInfoAboutGame()
+            val data = getInfoAboutGame()
             val intent = Intent(this, GameActivity::class.java).apply{
-                putExtra(EXTRA_TIME, gameInfo.time)
-                putExtra(EXTRA_GAME_FIELD, gameInfo.gameField)
+                putExtra(EXTRA_TIME, data.time)
+                putExtra(EXTRA_GAME_FIELD, data.gameField)
             }
             startActivity(intent)
         }
