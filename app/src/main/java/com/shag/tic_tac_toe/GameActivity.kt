@@ -211,7 +211,7 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
-        makeStepUI("${move.row}${move.column}","0")
+        makeStep(move.row, move.column, "0")
 
         return move
 
