@@ -109,6 +109,8 @@ class GameActivity : AppCompatActivity() {
         binding.chronometr.start()
     }
 
+
+
     override fun onDestroy(){
         super.onDestroy()
         mediaPlayer.release()
@@ -118,6 +120,9 @@ class GameActivity : AppCompatActivity() {
         super.onStop()
         mediaPlayer.release()
     }
+
+
+
     private fun setVolumeMediaPlayer(soundValue: Int){
         val volume = soundValue/100.0
         mediaPlayer.setVolume(volume.toFloat(), volume.toFloat())
